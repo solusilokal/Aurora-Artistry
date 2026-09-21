@@ -1,0 +1,641 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  MapPin, 
+  MessageCircle, 
+  X, 
+  ChevronLeft, 
+  ChevronRight, 
+  ArrowDown, 
+  Share, 
+  Copy, 
+  Check, 
+  Star, 
+  Quote, 
+  Sparkles, 
+  Camera, 
+  ChevronDown, 
+  CalendarHeart 
+} from 'lucide-react';
+
+const Instagram = ({ size = 16, className = "" }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+  </svg>
+);
+
+const Facebook = ({ size = 16, className = "" }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+  </svg>
+);
+
+const Twitter = ({ size = 16, className = "" }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+  </svg>
+);
+
+
+const pageData = {
+  name: "Aurora Artistry",
+  phone: "6289529605601",
+  address: "Jl. R.A. Kartini No. 12, Palangka Raya, Kalimantan Tengah",
+  title: "Pancarkan Cantik Alamimu di Setiap Momen Spesial",
+  description: "Layanan Professional Makeup Artist untuk Wedding, Lamaran, Wisuda, dan Pesta. Membantu Anda tampil sempurna dan percaya diri di hari bahagia.",
+  profileImg: "./profile.png", 
+  heroImg: "./hero-bg.jpg",
+  links: {
+    instagram: "https://www.instagram.com/solusilokal.id",
+    maps: "https://maps.google.com/?cid=14069429955240119508&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ", 
+    facebook: "https://facebook.com/", 
+    tiktok: "https://www.tiktok.com/@solusilokal.id" 
+  },
+  about: "Aurora Artistry adalah studio makeup profesional yang berdedikasi untuk memancarkan kecantikan autentik setiap klien. Kami percaya bahwa setiap wajah adalah kanvas unik, dan tugas kami adalah menonjolkan fitur terbaik Anda tanpa menghilangkan karakter asli. Menggunakan produk premium berkualitas tinggi untuk hasil yang flawless, tahan lama, dan memukau.",
+  history: [
+    { year: "2018", title: "Awal Perjalanan", desc: "Memulai karir dari passion di bidang kecantikan dengan mengikuti berbagai kelas makeup dasar." },
+    { year: "2020", title: "Aurora Artistry Lahir", desc: "Resmi mendirikan brand Aurora Artistry dan mulai melayani makeup wisuda & party." },
+    { year: "2022", title: "Buka Studio Pertama", desc: "Meresmikan studio makeup fisik pertama di pusat kota untuk melayani klien dengan lebih nyaman." },
+    { year: "2024", title: "Sertifikasi Profesional", desc: "Mendapatkan sertifikasi MUA Nasional dan berekspansi ke layanan Wedding Makeup komprehensif." }
+  ],
+  pricelist: [
+    { name: "Graduation Makeup", price: "Rp 350.000", desc: "Include Hairdo/Hijab styling & Free Softlens", popular: false },
+    { name: "Party / Bridesmaid", price: "Rp 400.000", desc: "Flawless makeup tahan seharian, include Hairdo/Hijab", popular: true },
+    { name: "Engagement Makeup", price: "Rp 800.000", desc: "Premium makeup, touch-up kit, Hairdo/Hijab, & Softlens", popular: false },
+    { name: "Wedding Package", price: "Mulai Rp 3.500.000", desc: "Akad & Resepsi, Melati, Aksesoris, Test Makeup", popular: false }
+  ],
+  faq: [
+    { q: "Apakah melayani Home Service?", a: "Ya, kami melayani Home Service (datang ke lokasi klien) dengan tambahan biaya transport sesuai jarak tempuh dari studio kami." },
+    { q: "Berapa lama proses makeup dilakukan?", a: "Proses makeup dan hairdo/hijab do biasanya memakan waktu sekitar 1,5 hingga 2 jam untuk wisuda/party, dan 3 jam untuk pengantin." },
+    { q: "Apakah harga sudah termasuk softlens dan bulu mata?", a: "Ya, semua paket makeup kami sudah free pemasangan bulu mata palsu. Untuk softlens, gratis khusus paket Engagement & Wedding (atau sesuai promo paket)." },
+    { q: "Bagaimana cara booking jadwal?", a: "Booking jadwal dianggap sah setelah klien melakukan DP (Down Payment) minimal 30% dari total harga. Silakan isi form di bawah untuk cek ketersediaan tanggal." }
+  ],
+  testimonials: [
+    { name: "Nadia Larasati", rating: 5, event: "Wedding Makeup", text: "Suka banget sama hasil makeupnya! Beneran flawless, awet dari pagi sampai malam padahal nangis pas sungkeman. Kakaknya juga ramah banget." },
+    { name: "Dina Amelia", rating: 5, event: "Graduation", text: "Makeup wisuda ternyaman. Nggak dempul sama sekali, ringan di wajah, dan hasilnya di foto cakep banget. Recommended!" },
+    { name: "Siska Putri", rating: 4, event: "Engagement", text: "Puas banget sama hasilnya, dapet banyak pujian dari keluarga. Softlens dan hairdo-nya juga rapi. Makasih Aurora Artistry!" }
+  ],
+  galleryPhotos: [
+    "./gallery/gallery-1.webp",
+    "./gallery/gallery-2.webp",
+    "./gallery/gallery-3.webp",
+    "./gallery/gallery-4.webp",
+    "./gallery/gallery-5.webp",
+  ]
+};
+
+export default function App() {
+  const [lightbox, setLightbox] = useState<{ isOpen: boolean; images: string[]; currentIndex: number }>({
+    isOpen: false,
+    images: [],
+    currentIndex: 0
+  });
+  const [showStickyCTA, setShowStickyCTA] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 600) {
+        setShowStickyCTA(true);
+      } else {
+        setShowStickyCTA(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const openLightbox = (images: string[], index: number) => {
+    setLightbox({ isOpen: true, images, currentIndex: index });
+    document.body.style.overflow = 'hidden'; 
+  };
+
+  const closeLightbox = () => {
+    setLightbox(prev => ({ ...prev, isOpen: false }));
+    document.body.style.overflow = 'unset';
+  };
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLightbox(prev => ({
+      ...prev,
+      currentIndex: (prev.currentIndex + 1) % prev.images.length
+    }));
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLightbox(prev => ({
+      ...prev,
+      currentIndex: (prev.currentIndex - 1 + prev.images.length) % prev.images.length
+    }));
+  };
+
+  const scrollToForm = () => {
+    document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get('name');
+    const date = formData.get('date');
+    const serviceType = formData.get('serviceType');
+    const location = formData.get('location');
+    const notes = formData.get('notes');
+    
+    const waText = `Halo admin ${pageData.name}, saya ingin booking makeup dengan detail berikut:%0A%0A` +
+      `Nama: ${name}%0A` +
+      `Tanggal: ${date}%0A` +
+      `Layanan: ${serviceType}%0A` +
+      `Lokasi: ${location}%0A` +
+      `Catatan: ${notes}%0A%0A` +
+      `Apakah jadwal tersebut masih tersedia?`;
+      
+    window.open(`https://wa.me/${pageData.phone}?text=${waText}`, '_blank');
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: pageData.name,
+      text: pageData.title,
+      url: window.location.href,
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      setShowShareModal(true);
+    }
+  };
+
+  const copyToClipboard = () => {
+    const tempInput = document.createElement('input');
+    tempInput.value = window.location.href;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const shareToWhatsApp = () => window.open(`https://wa.me/?text=${encodeURIComponent(pageData.title + ' ' + window.location.href)}`, '_blank');
+  const shareToFacebook = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+  const shareToTwitter = () => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(pageData.name)}`, '_blank');
+
+  return (
+    <>
+      <main className="w-full max-w-[480px] mx-auto relative shadow-[0_0_50px_rgba(0,0,0,0.8)] bg-[#04060b] min-h-screen overflow-hidden pb-32">
+        
+        {/* Header / Hero Section */}
+        <section className="relative w-full min-h-[90dvh] flex flex-col justify-end pb-12 px-6 bg-[#020305]">
+          
+          <button
+            onClick={handleShare}
+            aria-label="Bagikan"
+            className="absolute top-6 right-6 z-20 p-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white hover:bg-white/20 transition-all shadow-sm"
+          >
+            <Share size={18} />
+          </button>
+
+          <div className="absolute inset-0 z-0">
+            <img 
+              src={pageData.heroImg} 
+              alt={pageData.name} 
+              className="w-full h-full object-cover object-top opacity-60"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#04060b] via-[#04060b]/75 to-transparent"></div>
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center text-center mt-32">
+            <div className="w-28 h-28 rounded-full p-1 bg-gradient-to-tr from-[#38bdf8] via-[#a78bfa] to-[#f472b6] mb-6 shadow-2xl">
+              <img 
+                src={pageData.profileImg} 
+                alt="Profile" 
+                className="w-full h-full rounded-full object-cover border-2 border-[#04060b] bg-white p-1"
+              />
+            </div>
+
+            <h1 className="text-5xl font-bold text-[#f8fafc] mb-2 leading-tight tracking-wide drop-shadow-md serif-font">
+              {pageData.name}
+            </h1>
+            <p className="aurora-gradient-text font-medium text-xs tracking-wider uppercase mb-6">
+              Professional Makeup Studio
+            </p>
+            
+            <p className="text-slate-300 font-light text-[13px] leading-relaxed mb-8 max-w-[95%]">
+              {pageData.title}
+            </p>
+
+            <div className="flex flex-col w-full max-w-sm mb-8 gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <a 
+                  href={pageData.links.instagram} target="_blank" rel="noreferrer"
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/15 transition-all text-white shadow-sm text-xs font-medium tracking-wide"
+                >
+                  <Instagram size={16} className="text-[#f472b6]" /> Instagram
+                </a>
+                <a 
+                  href={pageData.links.tiktok} target="_blank" rel="noreferrer"
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/15 transition-all text-white shadow-sm text-xs font-medium tracking-wide"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className="text-[#38bdf8]">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  </svg> TikTok
+                </a>
+              </div>
+              
+              <a 
+                href={pageData.links.maps} target="_blank" rel="noreferrer"
+                className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/15 transition-all text-white shadow-sm text-xs font-medium tracking-wide w-full"
+              >
+                <MapPin size={16} className="text-[#a78bfa]" /> Lokasi Studio
+              </a>
+            </div>
+
+            <button 
+              onClick={scrollToForm}
+              className="group relative flex items-center justify-center gap-2 w-full max-w-sm py-4 bg-gradient-to-r from-[#7c3aed] via-[#4f46e5] to-[#2563eb] text-white rounded-xl font-semibold text-[13px] uppercase tracking-[0.1em] hover:opacity-95 transition-all shadow-lg"
+            >
+              Booking Jadwal
+              <ArrowDown size={16} className="group-hover:translate-y-1 transition-transform" />
+            </button>
+          </div>
+        </section>
+
+        {/* Tentang Kami */}
+        <section className="py-14 px-8 bg-[#04060b] text-center border-t border-slate-900">
+          <Sparkles size={28} className="mx-auto text-[#38bdf8] mb-4" />
+          <h2 className="text-3xl font-bold text-slate-100 mb-5 serif-font">Tentang Kami</h2>
+          <p className="text-slate-300 text-[13px] leading-relaxed font-light text-justify px-2">
+            {pageData.about}
+          </p>
+        </section>
+
+        {/* Our Journey */}
+        <section className="py-12 px-6 bg-[#070a12] border-y border-slate-900">
+          <h2 className="text-3xl font-bold text-slate-100 mb-8 text-center serif-font">Our Journey</h2>
+          <div className="relative pl-4 border-l border-[#38bdf8]/50 ml-4">
+            {pageData.history.map((item, idx) => (
+              <div key={idx} className="mb-8 relative">
+                <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#38bdf8] ring-4 ring-[#070a12]"></div>
+                <div className="pl-4">
+                  <span className="inline-block py-1 px-3 rounded-full bg-[#0d1320] text-[#38bdf8] text-[10px] font-bold tracking-wider mb-2 border border-slate-800">
+                    {item.year}
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-100 mb-1 serif-font">{item.title}</h3>
+                  <p className="text-slate-400 text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Portfolio Katalog */}
+        <section className="py-12 bg-[#04060b]">
+          <div className="px-6 mb-6 flex justify-between items-end">
+            <div>
+              <h2 className="text-3xl font-bold text-slate-100 serif-font mb-1">Portfolio Katalog</h2>
+              <p className="text-slate-400 text-xs">Sentuhan magis untuk hari spesialmu</p>
+            </div>
+            <Camera className="text-[#f472b6]" size={24} />
+          </div>
+          
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-6 pb-6 no-scrollbar">
+            {pageData.galleryPhotos.map((img, idx) => (
+              <div 
+                key={idx}
+                onClick={() => openLightbox(pageData.galleryPhotos, idx)}
+                className="snap-center shrink-0 w-[260px] aspect-[4/5] rounded-xl overflow-hidden cursor-pointer relative group bg-[#0d1320] border border-slate-900"
+              >
+                <img 
+                  src={img} 
+                  alt={"Portfolio " + (idx + 1)} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Service & Harga */}
+        <section className="py-12 px-6 bg-[#070a12] border-t border-slate-900">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-slate-100 serif-font mb-2">Service & Harga</h2>
+            <p className="text-slate-400 text-xs">Pilih paket makeup sesuai kebutuhanmu</p>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {pageData.pricelist.map((pkg, idx) => (
+              <div key={idx} className={`relative p-5 rounded-2xl bg-[#0d1320] border ${pkg.popular ? 'border-[#38bdf8] shadow-lg shadow-sky-950/40' : 'border-slate-900'} transition-all`}>
+                {pkg.popular && (
+                  <div className="absolute -top-3 right-4 bg-gradient-to-r from-[#38bdf8] to-[#7c3aed] text-white text-[10px] font-bold uppercase tracking-wider py-1 px-3 rounded-full shadow-sm">
+                    Most Popular
+                  </div>
+                )}
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-semibold text-slate-100 text-sm uppercase tracking-wide">{pkg.name}</h3>
+                  <span className="font-bold text-[#38bdf8] text-sm">{pkg.price}</span>
+                </div>
+                <p className="text-slate-400 text-xs leading-relaxed">{pkg.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Lokasi Studio */}
+        <section className="py-12 px-6 bg-[#04060b] border-t border-slate-900">
+          <h2 className="text-3xl font-bold text-slate-100 text-center serif-font mb-6">Lokasi Studio</h2>
+          <div className="bg-[#0d1320] border border-slate-900 p-5 rounded-2xl flex items-start gap-4 shadow-md">
+            <div className="bg-[#04060b] p-3 rounded-full shadow-sm border border-slate-800 text-[#f472b6]">
+              <MapPin size={24} />
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-100 text-sm mb-1">{pageData.name} Studio</h4>
+              <p className="text-slate-400 text-xs leading-relaxed mb-3">{pageData.address}</p>
+              <a 
+                href={pageData.links.maps} 
+                target="_blank" rel="noreferrer"
+                className="inline-block text-[#38bdf8] text-xs font-semibold border-b border-[#38bdf8] pb-0.5"
+              >
+                Buka di Google Maps
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="py-12 px-6 bg-[#070a12] border-t border-slate-900">
+          <h2 className="text-3xl font-bold text-slate-100 text-center serif-font mb-8">FAQ</h2>
+          <div className="flex flex-col gap-3">
+            {pageData.faq.map((item, idx) => (
+              <div key={idx} className="bg-[#0d1320] border border-slate-900 rounded-xl overflow-hidden shadow-sm">
+                <button 
+                  onClick={() => toggleFaq(idx)}
+                  className="w-full flex items-center justify-between p-4 text-left focus:outline-none"
+                >
+                  <span className="font-medium text-slate-200 text-[13px] pr-4">{item.q}</span>
+                  <ChevronDown 
+                    size={16} 
+                    className={`text-[#38bdf8] transition-transform duration-300 ${openFaqIndex === idx ? 'rotate-180' : ''}`} 
+                  />
+                </button>
+                <div 
+                  className={`px-4 pb-4 text-xs text-slate-400 leading-relaxed transition-all duration-300 ${openFaqIndex === idx ? 'block' : 'hidden'}`}
+                >
+                  {item.a}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Testimoni Klien */}
+        <section className="py-12 bg-[#04060b] border-t border-slate-900">
+          <div className="px-6 mb-6">
+            <h2 className="text-3xl font-bold text-slate-100 serif-font mb-2">Testimoni Klien</h2>
+            <p className="text-slate-400 text-xs">Ulasan manis dari mereka yang mempercayakan harinya.</p>
+          </div>
+
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-6 pb-6 no-scrollbar">
+            {pageData.testimonials.map((testi, idx) => (
+              <div key={idx} className="snap-center shrink-0 w-[280px] bg-[#0d1320] p-6 rounded-2xl border border-slate-900 shadow-sm flex flex-col gap-3">
+                <div className="flex justify-between items-start">
+                  <Quote size={20} className="text-[#38bdf8]/40" />
+                  <div className="flex gap-0.5">
+                    {[...Array(testi.rating)].map((_, i) => (
+                      <Star key={i} size={12} className="fill-[#38bdf8] text-[#38bdf8]" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-slate-300 text-[13px] leading-relaxed italic flex-grow">"{testi.text}"</p>
+                <div className="mt-2 pt-4 border-t border-slate-900">
+                  <span className="block font-bold text-slate-100 text-[13px]">{testi.name}</span>
+                  <span className="block text-slate-400 text-[10px] uppercase tracking-wider mt-0.5">{testi.event}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Booking Form */}
+        <section id="booking-form" className="py-14 px-6 bg-[#020305] border-t border-slate-900">
+          <div className="bg-[#0b101c] border border-slate-900 rounded-[24px] p-8 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#38bdf8]/10 to-transparent rounded-bl-full pointer-events-none"></div>
+            
+            <div className="relative z-10 mb-8 text-center">
+              <CalendarHeart className="mx-auto text-[#f472b6] mb-3" size={32} />
+              <h2 className="text-2xl font-bold text-slate-100 serif-font mb-2">Booking Jadwal</h2>
+              <p className="text-slate-400 text-xs leading-relaxed">Amankan tanggal spesialmu dari sekarang. Isi form untuk cek ketersediaan via WhatsApp.</p>
+            </div>
+            
+            <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 relative z-10">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Nama Lengkap</label>
+                <input 
+                  type="text" name="name" required
+                  placeholder="Ketik nama Anda"
+                  className="w-full bg-[#04060b] border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] transition-all"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Tanggal Acara</label>
+                <input 
+                  type="date" name="date" required
+                  className="w-full bg-[#04060b] border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-slate-100 focus:outline-none focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] transition-all"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Jenis Layanan</label>
+                <select 
+                  name="serviceType" required
+                  className="w-full bg-[#04060b] border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-slate-100 focus:outline-none focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] transition-all appearance-none"
+                >
+                  <option value="" className="bg-[#04060b]">Pilih layanan makeup...</option>
+                  {pageData.pricelist.map((pkg, i) => (
+                    <option key={i} value={pkg.name} className="bg-[#04060b]">{pkg.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Lokasi Makeup</label>
+                <select 
+                  name="location" required
+                  className="w-full bg-[#04060b] border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-slate-100 focus:outline-none focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] transition-all appearance-none"
+                >
+                  <option value="Studio Aurora Artistry" className="bg-[#04060b]">Datang ke Studio</option>
+                  <option value="Home Service" className="bg-[#04060b]">Home Service / Datang ke Lokasi</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Catatan (Opsional)</label>
+                <textarea 
+                  name="notes" rows={2}
+                  placeholder="Cth: Ingin finish makeup matte, alis jangan dicukur..."
+                  className="w-full bg-[#04060b] border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#38bdf8] focus:ring-1 focus:ring-[#38bdf8] transition-all resize-none"
+                ></textarea>
+              </div>
+
+              <button 
+                type="submit"
+                className="w-full mt-4 bg-gradient-to-r from-[#38bdf8] to-[#2563eb] text-slate-950 font-bold text-[13px] tracking-wide py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md cursor-pointer"
+              >
+                Kirim via WhatsApp
+                <MessageCircle size={18} className="text-slate-950 fill-current" />
+              </button>
+            </form>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="pt-10 pb-14 text-center flex flex-col items-center justify-center bg-[#020305] text-white px-6 border-t border-slate-950">
+          <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4 p-1 overflow-hidden ring-2 ring-[#38bdf8]/30">
+            <img src={pageData.profileImg} alt="Footer Logo" className="w-full h-full object-contain rounded-full" />
+          </div>
+          
+          <h3 className="font-bold text-lg mb-1 serif-font text-slate-100">{pageData.name}</h3>
+          <p className="text-slate-400 text-[11px] max-w-[250px] mb-6">{pageData.address}</p>
+
+          <p className="text-slate-500 text-[10px]">
+            © {new Date().getFullYear()} {pageData.name}. All rights reserved.
+          </p>
+          <a 
+            href="https://www.solusilokal.id" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[#38bdf8] hover:underline text-[10px] mt-2 tracking-wide font-medium transition-colors"
+          >
+            powered by solusilokal.id
+          </a>
+        </footer>
+
+        {/* Floating CTA */}
+        <div 
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-[432px] z-40 transition-all duration-500 ease-out ${
+            showStickyCTA ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0 pointer-events-none'
+          }`}
+        >
+          <button 
+            onClick={scrollToForm}
+            className="w-full flex items-center justify-between px-6 py-4 bg-[#0b101c]/90 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] active:scale-[0.98] transition-all cursor-pointer"
+          >
+            <div className="flex flex-col items-start">
+              <span className="font-bold text-[13px] text-slate-100">Amankan Jadwal</span>
+              <span className="text-[10px] text-slate-400">Booking makeup sekarang</span>
+            </div>
+            <div className="bg-gradient-to-r from-[#38bdf8] to-[#7c3aed] text-white p-2.5 rounded-xl">
+              <Sparkles size={16} />
+            </div>
+          </button>
+        </div>
+
+      </main>
+
+      {/* Lightbox Modal */}
+      {lightbox.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm" onClick={closeLightbox}>
+          <button className="absolute top-6 right-6 p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-all z-50 border border-white/20" onClick={closeLightbox}>
+            <X size={20} />
+          </button>
+
+          {lightbox.images.length > 1 && (
+            <button className="absolute left-4 p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-all z-50 border border-white/20" onClick={prevImage}>
+              <ChevronLeft size={24} />
+            </button>
+          )}
+
+          <div className="w-full max-w-4xl max-h-[100dvh] p-4 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <img src={lightbox.images[lightbox.currentIndex]} alt="Lightbox View" className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl" />
+          </div>
+
+          {lightbox.images.length > 1 && (
+            <button className="absolute right-4 p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-all z-50 border border-white/20" onClick={nextImage}>
+              <ChevronRight size={24} />
+            </button>
+          )}
+          
+          {lightbox.images.length > 1 && (
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white text-[10px] font-bold tracking-[0.2em] bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/20">
+              {lightbox.currentIndex + 1} / {lightbox.images.length}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center transition-opacity" onClick={() => setShowShareModal(false)}>
+          <div className="w-full max-w-[480px] bg-[#0b101c] border border-slate-800 sm:rounded-3xl rounded-t-3xl p-6 relative overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-center items-center mb-6 relative">
+              <h3 className="text-slate-100 font-bold text-[15px] serif-font">Bagikan {pageData.name}</h3>
+              <button onClick={() => setShowShareModal(false)} className="absolute right-0 p-1 text-slate-400 hover:bg-slate-900 rounded-full transition-all">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="bg-[#04060b] border border-slate-900 rounded-[24px] p-8 flex flex-col items-center justify-center mb-8 shadow-sm">
+              <img src={pageData.profileImg} alt="Profile" className="w-[72px] h-[72px] rounded-full border border-[#38bdf8] p-1 mb-4 object-contain bg-white" />
+              <h4 className="text-slate-100 font-bold text-lg text-center tracking-tight">@{pageData.name.toLowerCase().replace(/\s/g, '')}</h4>
+              <p className="text-slate-400 text-xs mt-1 text-center font-medium">Beauty Studio</p>
+            </div>
+
+            <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar items-start px-1 mb-4">
+              <div className="flex flex-col items-center gap-2 min-w-[76px]">
+                <button onClick={copyToClipboard} className="w-[56px] h-[56px] rounded-full bg-[#1b263b] flex items-center justify-center text-slate-200 hover:bg-[#27374d] transition-all shadow-sm">
+                  {copied ? <Check size={22} className="text-green-400" /> : <Copy size={22} />}
+                </button>
+                <span className="text-[10px] font-semibold text-slate-400 text-center">{copied ? 'Tersalin' : 'Salin Tautan'}</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[76px]">
+                <button onClick={shareToTwitter} className="w-[56px] h-[56px] rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-white hover:bg-black transition-all shadow-sm">
+                  <Twitter size={22} />
+                </button>
+                <span className="text-[10px] font-semibold text-slate-400 text-center">X</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[76px]">
+                <button onClick={shareToFacebook} className="w-[56px] h-[56px] rounded-full bg-[#1877F2] flex items-center justify-center text-white hover:brightness-110 transition-all shadow-sm">
+                  <Facebook size={22} className="fill-current" />
+                </button>
+                <span className="text-[10px] font-semibold text-slate-400 text-center">Facebook</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[76px]">
+                <button onClick={shareToWhatsApp} className="w-[56px] h-[56px] rounded-full bg-[#25D366] flex items-center justify-center text-white hover:brightness-110 transition-all shadow-sm">
+                  <MessageCircle size={22} className="fill-current" />
+                </button>
+                <span className="text-[10px] font-semibold text-slate-400 text-center">WhatsApp</span>
+              </div>
+            </div>
+            
+            <div className="w-full h-px bg-slate-900 mb-4 mt-2"></div>
+            
+            <div className="flex flex-col items-center text-center">
+              <h5 className="text-slate-100 font-bold text-[13px] mb-1">Ikuti Kami</h5>
+              <p className="text-slate-400 text-[11px] mb-4">Lihat portofolio terbaru kami di Instagram.</p>
+              <a href={pageData.links.instagram} target="_blank" rel="noreferrer" className="w-full py-3.5 bg-gradient-to-r from-[#38bdf8] to-[#2563eb] text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 transition-opacity tracking-wide uppercase">
+                Kunjungi Instagram
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
